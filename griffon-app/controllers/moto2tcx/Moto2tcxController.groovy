@@ -1,5 +1,9 @@
 package moto2tcx
 
+import groovy.swing.SwingBuilder
+import javax.swing.filechooser.FileFilter
+import javax.swing.JFileChooser
+
 class Moto2tcxController {
     // these will be injected by Griffon
     def model
@@ -21,4 +25,21 @@ class Moto2tcxController {
     def action = { evt = null ->
     }
     */
+	
+	def chooseFile = { evt = null ->
+		def openChooseFileDialog  = new SwingBuilder().fileChooser(dialogTitle:"Choose an csv file", 
+                                   id:"openExcelDialog", fileSelectionMode : JFileChooser.FILES_ONLY, 
+                                   //the file filter must show also directories, in order to be able to look into them
+                                   fileFilter: [getDescription: {-> "*.csv"}, accept:{file-> file ==~ /.*?\.csv/ || file.isDirectory() }] as FileFilter) {}
+		//later, in the controller
+		def fc = openChooseFileDialog
+		if(fc.showOpenDialog() != JFileChooser.APPROVE_OPTION) return //user cancelled
+		model.fileName = fc.selectedFile
+		println model.sport
+		println model.fileName
+		model.sport = "Running"
+	}
+	
+	def convert = { evt = null ->
+	}
 }

@@ -10,5 +10,12 @@ application(title: 'moto2tcx',
                imageIcon('/griffon-icon-32x32.png').image,
                imageIcon('/griffon-icon-16x16.png').image]) {
     // add content here
-    label('Content Goes Here') // delete me
+    formPanel('ConvertForm.xml')
+	noparent {
+		bean(model, sport: bind{ cboSport.selectedItem })
+		bean(model, fileName: bind{ txtFile.text })
+		bean(btnFile, actionPerformed: controller.chooseFile)
+		bean(btnConvert, actionPerformed: controller.convert)
+	}
 }
+
