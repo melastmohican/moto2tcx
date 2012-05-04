@@ -37,7 +37,6 @@ class Moto2tcxController {
 		model.fileName = fc.selectedFile
 		println model.sport
 		println model.fileName
-		model.sport = "Running"
 	}
 	
 	def convert = { evt = null ->

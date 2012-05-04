@@ -58,3 +58,4 @@
     <classpathentry kind="var" path="USER_HOME\.ivy2\cache\org.springframework\org.springframework.context.support\jars\org.springframework.context.support-3.1.0.RELEASE.jar" />
     <classpathentry kind="var" path="USER_HOME\.ivy2\cache\net.sf.json-lib\json-lib\jars\json-lib-2.4-jdk15.jar" />
     <classpathentry kind="var" path="USER_HOME\.ivy2\cache\org.codehaus.griffon.plugins\griffon-swing-compile\jars\griffon-swing-compile-0.9.5.jar" />
+</classpath>
