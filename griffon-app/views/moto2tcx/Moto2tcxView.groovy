@@ -13,7 +13,7 @@ application(title: 'moto2tcx',
     formPanel('ConvertForm.xml')
 	noparent {
 		bean(model, sport: bind{ cboSport.selectedItem })
-		bean(model, fileName: bind{ txtFile.text })
+		bean(txtFile, text: bind{ model.fileName })
 		bean(btnFile, actionPerformed: controller.chooseFile)
 		bean(btnConvert, actionPerformed: controller.convert)
 	}
