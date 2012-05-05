@@ -61,7 +61,9 @@ class Moto2tcxController {
 		ISO8601UTC.setTimeZone(TimeZone.getTimeZone("UTC"))
 		
 		Reader reader = new FileReader(model.fileName);		
-		def data = new CsvParser().parse(reader)
+	
+		def lines = new CsvParser().parse(reader).toList()
+		int size = lines.size()
 		
 		def writer = new StringWriter()
 		def builder = new MarkupBuilder(writer)
@@ -71,14 +73,23 @@ class Moto2tcxController {
 				'xsi:schemaLocation':'http://www.garmin.com/xmlschemas/ActivityExtension/v2 http://www.garmin.com/xmlschemas/ActivityExtensionv2.xsd http://www.garmin.com/xmlschemas/FatCalories/v1 http://www.garmin.com/xmlschemas/fatcalorieextensionv1.xsd http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd') {
 			Folders()
 			Activities() {
-				Activity(sport:model.sport) {
-					def start = new Date(new Long(data[0].timestamp_epoch))
-					Id(ISO8601UTC.format(start))
+				Activity(Sport:model.sport) {
+					def firstLine = lines[0]
+					def lastLine = lines[size-1]
+				
+					println firstLine
+					println lastLine
+					int start = new Long(firstLine.timestamp_epoch)
+					int end = new Long(lastLine.timestamp_epoch)
+					int total = (end-start)/1000			
+					def distance = lastLine.DISTANCE
+					int calories = new Double(lastLine.CALORIEBURN).toInteger()
+					Id(ISO8601UTC.format(new Date(start)))
 					Lap(StartTime:ISO8601UTC.format(start)) {
-						TotalTimeSeconds()
-						DistanceMeters()
+						TotalTimeSeconds(total)
+						DistanceMeters(distance)
 						MaximumSpeed()
-						Calories()
+						Calories(calories)
 						AverageHeartRateBpm('xsi:type':'HeartRateInBeatsPerMinute_t') {
 							Value()
 						}
@@ -88,7 +99,7 @@ class Moto2tcxController {
 						Intensity('Active')
 						TriggerMethod('Distance')
 						Track() { 
-							data.each { line -> 
+							lines.each { line -> 
 								Trackpoint() {
 									
 									def date = new Date(new Long(line.timestamp_epoch))		
@@ -100,7 +111,7 @@ class Moto2tcxController {
 									AltitudeMeters(line.ELEVATION) 
 									DistanceMeters(line.DISTANCE) 
 									HeartRateBpm( 'xsi:type':"HeartRateInBeatsPerMinute_t") {
-										Value(line.HEARTRATE)
+										Value(new Double(line.HEARTRATE).toInteger())
 									}
 									Cadence(line.CADENCE) 
 									SensorState('Absent') 
