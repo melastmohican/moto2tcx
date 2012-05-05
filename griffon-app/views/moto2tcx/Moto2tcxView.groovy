@@ -1,7 +1,7 @@
 package moto2tcx
 
 application(title: 'moto2tcx',
-  preferredSize: [320, 240],
+  preferredSize: [640, 480],
   pack: true,
   //location: [50,50],
   locationByPlatform:true,
