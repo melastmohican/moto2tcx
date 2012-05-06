@@ -8,27 +8,10 @@ import com.xlson.groovycsv.CsvParser
 import groovy.xml.MarkupBuilder
 
 class Moto2tcxController {
-    // these will be injected by Griffon
+	// these will be injected by Griffon
     def model
     def view
 
-    // void mvcGroupInit(Map args) {
-    //    // this method is called after model and view are injected
-    // }
-
-    // void mvcGroupDestroy() {
-    //    // this method is called when the group is destroyed
-    // }
-
-    /*
-        Remember that actions will be called outside of the UI thread
-        by default. You can change this setting of course.
-        Please read chapter 9 of the Griffon Guide to know more.
-       
-    def action = { evt = null ->
-    }
-    */
-	
 	def chooseFile = { evt = null ->
 		def openChooseFileDialog  = new SwingBuilder().fileChooser(dialogTitle:"Choose an csv file", 
                                    id:"openExcelDialog", fileSelectionMode : JFileChooser.FILES_ONLY, 
@@ -40,70 +23,58 @@ class Moto2tcxController {
 		model.fileName = fc.selectedFile
 	}
 	
-/**	
-	<Trackpoint>
-	<Time>2012-05-01T16:28:03Z</Time>
-	<Position>
-	 <LatitudeDegrees>37.39442</LatitudeDegrees>
-	 <LongitudeDegrees>-122.100174</LongitudeDegrees>
-	</Position>
-	<AltitudeMeters>-11.0</AltitudeMeters>
-	<DistanceMeters>1.9766617</DistanceMeters>
-	<HeartRateBpm xsi:type="HeartRateInBeatsPerMinute_t">
-	 <Value>73</Value>
-	</HeartRateBpm>
-	<Cadence>0</Cadence>
-	<SensorState>Absent</SensorState>
-   </Trackpoint>
-**/	
-	def convert = { evt = null ->
+	def convert = { evt = null ->	
 		SimpleDateFormat ISO8601UTC = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
 		ISO8601UTC.setTimeZone(TimeZone.getTimeZone("UTC"))
-		
+			
 		Reader reader = new FileReader(model.fileName);		
-	
 		def lines = new CsvParser().parse(reader).toList()
+		
 		int size = lines.size()
+		def firstLine = lines[0]
+		def lastLine = lines[size-1]
+		def sumHR = lines.sum() { line -> return new Double(line.HEARTRATE).toInteger() }
+		def avgHR = new Double(sumHR / lines.size()).toInteger()
+		
+		def maxHRLine = lines.max() { line -> return new Double(line.HEARTRATE).toInteger() }
+		def maxHR = new Double(maxHRLine.HEARTRATE).toInteger()
+		
+		def maxSpeedLine = lines.max() { line -> return new Double(line.SPEED) }
+		def maxSpeed = new Double(maxSpeedLine.SPEED)
+
+		long start = new Long(firstLine.timestamp_epoch)
+		long end = new Long(lastLine.timestamp_epoch)
+		long total = (end-start)/1000
+		def distance = lastLine.DISTANCE
+		int calories = new Double(lastLine.CALORIEBURN).toInteger()
 		
 		def writer = new StringWriter()
 		def builder = new MarkupBuilder(writer)
-		builder.mkp.xmlDeclaration(version:"1.0", encoding:"UTF-8")	
-		def xml = builder.TrainingCenterDatabase(xmlns:'http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2',
-				'xmlns:xsi':'http://www.w3.org/2001/XMLSchema-instance',
-				'xsi:schemaLocation':'http://www.garmin.com/xmlschemas/ActivityExtension/v2 http://www.garmin.com/xmlschemas/ActivityExtensionv2.xsd http://www.garmin.com/xmlschemas/FatCalories/v1 http://www.garmin.com/xmlschemas/fatcalorieextensionv1.xsd http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd') {
+		builder.mkp.xmlDeclaration(version:"1.0", encoding:"UTF-8", standalone:"no")	
+		def xml = builder.TrainingCenterDatabase(xmlns:"http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
+				"xmlns:xsi":"http://www.w3.org/2001/XMLSchema-instance",
+				"xsi:schemaLocation":"http://www.garmin.com/xmlschemas/ActivityExtension/v2 http://www.garmin.com/xmlschemas/ActivityExtensionv2.xsd http://www.garmin.com/xmlschemas/FatCalories/v1 http://www.garmin.com/xmlschemas/fatcalorieextensionv1.xsd http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2 http://www.garmin.com/xmlschemas/TrainingCenterDatabasev2.xsd") {
 			Folders()
 			Activities() {
-				Activity(Sport:model.sport) {
-					def firstLine = lines[0]
-					def lastLine = lines[size-1]
-				
-					println firstLine
-					println lastLine
-					int start = new Long(firstLine.timestamp_epoch)
-					int end = new Long(lastLine.timestamp_epoch)
-					int total = (end-start)/1000			
-					def distance = lastLine.DISTANCE
-					int calories = new Double(lastLine.CALORIEBURN).toInteger()
+				Activity(Sport:model.sport) {								
 					Id(ISO8601UTC.format(new Date(start)))
 					Lap(StartTime:ISO8601UTC.format(start)) {
 						TotalTimeSeconds(total)
 						DistanceMeters(distance)
-						MaximumSpeed()
+						MaximumSpeed(maxSpeed)
 						Calories(calories)
 						AverageHeartRateBpm('xsi:type':'HeartRateInBeatsPerMinute_t') {
-							Value()
+							Value(avgHR)
 						}
 						MaximumHeartRateBpm('xsi:type':'HeartRateInBeatsPerMinute_t') {
-							Value()
+							Value(maxHR)
 						}
 						Intensity('Active')
 						TriggerMethod('Distance')
 						Track() { 
 							lines.each { line -> 
-								Trackpoint() {
-									
-									def date = new Date(new Long(line.timestamp_epoch))		
-									Time(ISO8601UTC.format(date)) 
+								Trackpoint() {	
+									Time(ISO8601UTC.format(new Date(new Long(line.timestamp_epoch)))) 
 									Position() {
 										LatitudeDegrees(line.LATITUDE) 
 										LongitudeDegrees(line.LONGITUDE)
