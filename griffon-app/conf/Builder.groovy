@@ -6,4 +6,4 @@ root {
     }
 }
 
-root.'griffon.builder.abeilleform.AbeilleFormBuilder'.view = '*'
+
