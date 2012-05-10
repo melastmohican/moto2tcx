@@ -13,6 +13,7 @@ application(title: 'moto2tcx',
                imageIcon('/griffon-icon-32x32.png').image,
                imageIcon('/griffon-icon-16x16.png').image]) {
     // add content here   
+   lookAndFeel('system')
    borderLayout()
    
    panel(constraints:CENTER) {
