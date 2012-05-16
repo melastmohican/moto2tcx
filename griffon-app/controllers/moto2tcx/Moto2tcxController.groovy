@@ -6,19 +6,44 @@ import javax.swing.filechooser.FileFilter
 import javax.swing.JFileChooser
 import com.xlson.groovycsv.CsvParser
 import groovy.xml.MarkupBuilder
+import groovy.util.ConfigSlurper
 
 class Moto2tcxController {
 	// these will be injected by Griffon
 	def model
 	def view
+	
+	def settingsFile =  System.properties['user.home'] + "/.moto2ctx/settings.groovy"
+	
+	def settings = new ConfigSlurper().parse('''
+	last.directory = '.'
+	''')
 
 	def chooseFile = { evt = null ->
+		
 		def openFileDialog  = new JFileChooser(dialogTitle:"Choose an CSV file",
 				fileSelectionMode : JFileChooser.FILES_ONLY,
 				fileFilter: [getDescription: {-> "*.csv"}, accept:{file-> file.getName() ==~ /.*?\.csv/ || file.isDirectory() }] as FileFilter)
 		
+		try {
+			def saved = new ConfigSlurper().parse(new File(settingsFile).toURL())
+			settings = settings.merge(saved) 
+		} catch (all) {
+		}
+		
+		openFileDialog.currentDirectory = new File(settings.last.directory)
+		
 		if(openFileDialog.showOpenDialog() != JFileChooser.APPROVE_OPTION) return //user cancelled
-		model.fileName = openFileDialog.selectedFile
+		model.fileName = openFileDialog.selectedFile				
+		settings.last.directory = openFileDialog.currentDirectory.absolutePath
+		def settingsFile = new File(settingsFile)
+		try {
+			settingsFile << "// moto2tcx settings"
+		} catch (all) {
+			def settingsDir = new File(System.properties['user.home'] + "/.moto2ctx")
+			settingsDir.mkdir()
+		}
+		settingsFile.withWriter { writer -> settings.writeTo(writer) }
 	}
 
 	def convert = { evt = null ->
@@ -124,6 +149,7 @@ class Moto2tcxController {
 		def saveFileDialog  = new JFileChooser(dialogTitle:"Select destination file",
 				fileSelectionMode : JFileChooser.FILES_ONLY, dialogType: JFileChooser.SAVE_DIALOG,
 				fileFilter: [getDescription: {-> "*.tcx"}, accept:{file-> file.getName() ==~ /.*?\.tcx/ || file.isDirectory() }] as FileFilter)
+		saveFileDialog.currentDirectory = new File(settings.last.directory)
 		saveFileDialog.selectedFile = new File(outputFile)
 		if(saveFileDialog.showSaveDialog() == JFileChooser.APPROVE_OPTION) {
 			saveFileDialog.selectedFile.write(writer.toString())
