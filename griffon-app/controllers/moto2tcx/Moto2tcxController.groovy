@@ -25,7 +25,7 @@ class Moto2tcxController {
 		
 		if(openFileDialog.showOpenDialog() != JFileChooser.APPROVE_OPTION) return //user cancelled
 		model.fileName = openFileDialog.selectedFile				
-		settings.config.last.directory = openFileDialog.currentDirectory.absolutePath
+		settings.config.last.directory = Settings.escapeWindowsPath(openFileDialog.currentDirectory.absolutePath)
 		settings.save()
 	}
 
