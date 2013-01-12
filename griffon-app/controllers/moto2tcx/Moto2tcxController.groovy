@@ -35,6 +35,7 @@ class Moto2tcxController {
 
 		Reader reader = new FileReader(model.fileName);
 		def lines = new CsvParser().parse(reader).toList()
+		//println lines.grep({ (new Double(it.LATITUDE) != 0.0  && new Double(it.LONGITUDE) != 0.0) })
 
 		int size = lines.size()
 		def firstLine = lines[0]
@@ -74,7 +75,7 @@ class Moto2tcxController {
 								Intensity('Active')
 								TriggerMethod('Distance')
 								Track() {
-									lines.each { line ->
+									lines.grep({ (new Double(it.LATITUDE) != 0.0  && new Double(it.LONGITUDE) != 0.0) }).each { line ->
 										Trackpoint() {
 											Time(ISO8601UTC.format(new Date(new Long(line.timestamp_epoch))))
 											Position() {
