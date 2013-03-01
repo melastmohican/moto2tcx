@@ -99,9 +99,9 @@ signingkey {
 
 griffon {
     doc {
-        logo = '<a href="http://griffon-framework.org" target="_blank"><img alt="The Griffon Framework" src="../img/griffon.png" border="0"/></a>'
+        logo = '<a href="http://griffon.codehaus.org" target="_blank"><img alt="The Griffon Framework" src="../img/griffon.png" border="0"/></a>'
         sponsorLogo = "<br/>"
-        footer = "<br/><br/>Made with Griffon (@griffon.version@)"
+        footer = "<br/><br/>Made with Griffon (0.9.5)"
     }
 }
 
@@ -163,15 +163,17 @@ griffon.project.dependency.resolution = {
         // from public Maven repositories
         mavenLocal()
         mavenCentral()
-        //mavenRepo "http://snapshots.repository.codehaus.org"
+        mavenRepo "http://snapshots.repository.codehaus.org"
         mavenRepo "http://repository.codehaus.org"
         mavenRepo "http://download.java.net/maven/2/"
         mavenRepo "http://repository.jboss.com/maven2/"
     }
     dependencies {
-        runtime 'com.xlson.groovycsv:groovycsv:1.0'
-		// specify dependencies here under either 'build', 'compile', 'runtime' or 'test' scopes eg.
+        // specify dependencies here under either 'build', 'compile', 'runtime' or 'test' scopes eg.
+
         // runtime 'mysql:mysql-connector-java:5.1.5'
+        compile 'com.xlson.groovycsv:groovycsv:1.0'
+        runtime 'com.xlson.groovycsv:groovycsv:1.0'
     }
 }
 
@@ -191,5 +193,4 @@ log4j = {
 
 
 app.fileType = '.groovy'
-
 app.defaultPackageName = 'moto2tcx'
