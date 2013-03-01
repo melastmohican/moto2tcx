@@ -70,10 +70,10 @@ class Moto2tcxController {
 								DistanceMeters(distance)
 								MaximumSpeed(maxSpeed)
 								Calories(calories)
-								AverageHeartRateBpm('xsi:type':'HeartRateInBeatsPerMinute_t') { Value(avgHR) }
-								MaximumHeartRateBpm('xsi:type':'HeartRateInBeatsPerMinute_t') { Value(maxHR) }
-								Intensity('Active')
-								TriggerMethod('Distance')
+								AverageHeartRateBpm() { Value(avgHR) }
+								MaximumHeartRateBpm() { Value(maxHR) }
+								Intensity("Active")
+								TriggerMethod("Distance")
 								Track() {
 									lines.grep({ (new Double(it.LATITUDE) != 0.0  && new Double(it.LONGITUDE) != 0.0) }).each { line ->
 										Trackpoint() {
@@ -84,20 +84,20 @@ class Moto2tcxController {
 											}
 											AltitudeMeters(line.ELEVATION)
 											DistanceMeters(line.DISTANCE)
-											HeartRateBpm( 'xsi:type':"HeartRateInBeatsPerMinute_t") {
+											HeartRateBpm() {
 												Value(new Double(line.HEARTRATE).toInteger())
 											}
 											Cadence(line.CADENCE)
-											SensorState('Absent')
+											SensorState("Absent")
 										}
 									}
 
 								}
 							}
-							Creator('xsi:type':'Device_t') {
-								Name('melastmohican')
-								UnitId('007')
-								ProductID('007')
+							Creator("xsi:type":"Device_t") {
+								Name("melastmohican")
+								UnitId("7")
+								ProductID("7")
 								Version() {
 									VersionMajor(1)
 									VersionMinor(0)
@@ -109,8 +109,8 @@ class Moto2tcxController {
 					}
 					Workouts()
 					Courses()
-					Author('xsi:type':'Application_t') {
-						Name('Garmin Training Center')
+					Author("xsi:type":"Application_t") {
+						Name("Garmin Training Center")
 						Build() {
 							Version() {
 								VersionMajor(1)
@@ -118,12 +118,12 @@ class Moto2tcxController {
 								BuildMajor(1)
 								BuildMinor(0)
 							}
-							Type('Release')
-							Time('Jan  1 2012, 22:00:00')
-							Builder('melastmohican')
+							Type("Release")
+							Time("Jan  1 2012, 22:00:00")
+							Builder("melastmohican")
 						}
-						LangID('en')
-						PartNumber('006-A0183-00')
+						LangID("en")
+						PartNumber("006-A0183-00")
 					}
 
 				}
