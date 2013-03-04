@@ -57,6 +57,7 @@ class Moto2tcxController {
 
 		def writer = new StringWriter()
 		def builder = new MarkupBuilder(writer)
+		builder.setDoubleQuotes(true)
 		builder.mkp.xmlDeclaration(version:"1.0", encoding:"UTF-8", standalone:"no")
 		def xml = builder.TrainingCenterDatabase(xmlns:"http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2",
 				"xmlns:xsi":"http://www.w3.org/2001/XMLSchema-instance",
