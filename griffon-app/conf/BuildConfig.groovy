@@ -193,3 +193,7 @@ log4j = {
 app.fileType = '.groovy'
 
 app.defaultPackageName = 'moto2tcx'
+
+app.fileType = '.groovy'
+
+app.defaultPackageName = 'moto2tcx'
